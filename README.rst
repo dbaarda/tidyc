@@ -10,54 +10,54 @@ use GNU indent for formating C code. It includes some tests done to
 figure out the corner case behaviour of GNU indent to figure out how
 best to configure/use it.
 
-It has grown to include a `tidyc` script wrapper for `indent` that
+It has grown to include a ``tidyc`` script wrapper for ``indent`` that
 addresses several issues indent has, including:
 
 1. Adds support for using regexes for matching user-defined-types for
-   the `-T` argument. This means you don't need to explicitly list
+   the ``-T`` argument. This means you don't need to explicitly list
    every user-defined type for them to format correctly.
 
-2. Makes `-fca` correctly preserve blank-line paragraphs inside
+2. Makes ``-fca`` correctly preserve blank-line paragraphs inside
    "starred comments" with stars on the left hand side.
 
-3. Makes `-nsc` behave as a consistent inverse of `-sc`, removing
-   starring of comments without requiring `-fca`.
+3. Makes ``-nsc`` behave as a consistent inverse of ``-sc``, removing
+   starring of comments without requiring ``-fca``.
 
-4. Makes `-ncdb` behave as a consistent inverse of `-cdb`, removing
-   blank-line comment delimiters without requiring `-fca`, and also
-   removing them from the top of comments.
+4. Makes ``-ncdb`` behave as a consistent inverse of ``-cdb``,
+   removing blank-line comment delimiters without requiring ``-fca``,
+   and also removing them from the top of comments.
 
 5. Doesn't treat comments with stars and blank-line delimiters as
-   block comments, allowing `-ncdb` to remove blank-line delimiters,
-   `-nsc` to remove stars, and `-fca` to reformat them. This is a
+   block comments, allowing ``-ncdb`` to remove blank-line delimiters,
+   ``-nsc`` to remove stars, and ``-fca`` to reformat them. This is a
    consequence of 3. and 4. above.
 
 6. Always removes and never adds any trailing whitespace (indent adds
    a trailing space after blank lines in starred comments).
 
 7. Better Doxygen comment support with optinal reformating for both
-   JavaDoc and Qt style comments that doesn't break Qt style `/*!`
-   delimiters, and correctly indents JavaDoc style `/**<` member
+   JavaDoc and Qt style comments that doesn't break Qt style ``/*!``
+   delimiters, and correctly indents JavaDoc style ``/**<`` member
    comments.
 
-8.  Adds `-fcd` and `-nfcd` options to enable/disable Doxygen comment
-    formatting that includes reindenting, starring/unstarring with
-    `-sc` or `-nsc`, rebracketing with `-cdb` or `-ncdb`, and
-    reformatting with `-fca` and `-fc1`.
+8.  Adds ``-fcd`` and ``-nfcd`` options to enable/disable Doxygen
+    comment formatting that includes reindenting, starring/unstarring
+    with ``-sc`` or ``-nsc``, rebracketing with ``-cdb`` or ``-ncdb``,
+    and reformatting with ``-fca`` and ``-fc1``.
 
-9. Adds `-dqt` and `-ndqt` to select Doxygen Qt or JavaDoc style
+9. Adds ``-dqt`` and ``-ndqt`` to select Doxygen Qt or JavaDoc style
    comments. Comment delimiters will be changed to match the preferred
    style.
 
-10. Add `-dab` and `-ndab` options to enable/disable Doxygen AUTOBRIEF
-    support, removing or adding `\brief` tags to the first line of
-    Doxygen comments.
+10. Add ``-dab`` and ``-ndab`` options to enable/disable Doxygen
+    AUTOBRIEF support, removing or adding ``\brief`` tags to the first
+    line of Doxygen comments.
 
-11. Adds some convenient shortcuts like `-C` for `-fc1 -fca` and `-R`
-    for `-sob --ignore-newlines`.
+11. Adds some convenient shortcuts like ``-C`` for ``-fc1 -fca`` and
+    ``-R`` for ``-sob --ignore-newlines``.
 
 12. Has my preferred defaults which is mostly linux without tabs.
-    
+
 This is all implemented by doing pre and post processing with sed, so
 is potentially vulnerable to tripping over comment delimiters inside
 string constants etc.
@@ -110,43 +110,36 @@ To tidy source code just run::
 It has sensible defaults but can take any indent arguments with the
 following additions;
 
-   -L  Resets settings to `-linux`.
-   -K  Resets settings to `-kr`.
-   -G  Resets settings to `-gnu`.
-   -B  Resets settings to `-orig`.
-   -C  Reformat comments. Equivalent to `-fc1 -fca`.
-   -R  Reformat lines breaks. Equivalent to `-sob --ignore-newlines`.
-
+   -L  Resets settings to ``-linux``.
+   -K  Resets settings to ``-kr``.
+   -G  Resets settings to ``-gnu``.
+   -B  Resets settings to ``-orig``.
+   -C  Reformat comments. Equivalent to ``-fc1 -fca``.
+   -R  Reformat lines breaks. Equivalent to ``-sob --ignore-newlines``.
    -fcd, --format-doxygen-comments
        Enable Doxygen comment formatting. This will enable indenting,
        starring/unstaring based on -sc|-nsc, rebracketing with/without
        blank-line delimiters based on -cdb|-ncdb, and content
        reformating with -fca.
-
    -nfcd, --dont-format-doxygen-comments
        Disable Doxygen comment formatting. This will disable all
        reformatting of doxygen comments.
-
     -dqt, --doxygen-use-qt
        Select Doxygen Qt or JavaDoc style comments. This adjusts the
        Doxygen starting comment delimiter.
-    
     -ndqt, --doxygen-use-javadoc
-       Select Doxygen JavaDoc style comments. 
-
+       Select Doxygen JavaDoc style comments.
     -dab|--doxygen-autobrief
         Enable Doxygen autobrief support. This will remove \brief or
 	@brief tags from the first line of Doxygen comments
-    
     -ndab|--no-doxygen-autobrief
         Disable Doxygen autobrief support. This will add \brief or
-	@brief tags depending on `-dqt' to the first line of Doxygen
-	comments
-
+	@brief tags depending on ``-dqt`` to the first line of Doxygen
+	comments.
     -T <regex>
-        Like indent's `-T` except adds support for using extended
-	regexes like `/ev_\w+/` to match types like `ev_event`. Note
-	that `/w+_t/` is already included by default.
+        Like indent's ``-T`` except adds support for using extended
+	regexes like ``/ev_\w+/`` to match types like ``ev_event``. Note
+	that ``/w+_t/`` is already included by default.
 
 Support
 =======
@@ -160,7 +153,7 @@ Documentation
 
 http://minkirri.apana.org.au/~abo/projects/tidyc/
   The project homepage.
-  
+
 https://github.com/dbaarda/tidyc
   The project github mirror.
 
