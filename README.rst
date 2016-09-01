@@ -68,7 +68,7 @@ Contents
 
 This is a pretty random collection of little scripts and data files
 accumulated during the research and development of the ``tidyc``
-script.
+script
 
 =========== ======================================================
 Name        Description
@@ -82,7 +82,7 @@ gnu.args    Equivalent -gnu args sorted for easy comparison.
 orig.args   Equivalent -orig args sorted for easy comparison.
 test.c      Source file for testing with.
 tidyc       The script for tidying C source code.
-=========== =======================================================
+=========== ======================================================
 
 
 Credits
