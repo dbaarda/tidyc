@@ -1,0 +1,143 @@
+#!/bin/bash
+
+# Other interesting indent args;
+#   -sob - swallow extra blank lines.
+#   --ignore-newlines - reformat wrapped lines.
+#   -bfda - function definition args one per line.
+#   -ncs - no space after cast.
+#   -ppi2 - 2 space preprocessor indentation.
+#   -linux -nut -i4 - linux without tabs.
+#   -fc1 don't make column1 comments immutable.
+#   -fca reformat all non-block comments.
+INDENT_ARGS='-linux -nut -i4 -ppi2 -l120 -lc80 -fc1'
+#INDENT_ARGS='-linux -nut -i4 -ppi2 -l120 -lc80 -bfda'
+#INDENT_ARGS='-kr -nut -l120 -lc80'
+
+# Unfortunately indent requires -T arguments for every used-defined
+# type to correctly apply formatting of spaces around types. We cannot
+# know in advance what all the user-defined types are, and indent
+# doesn't support using regexes with -T. So instead we use sed with a
+# regex to make these minor adjustments after indent has run, using the
+# following regex to match user-defined types. This is the default, and
+# additional regexes can be added using "-T /regex/" arguments.
+TYPE_RE='(ev_\w+)|(\w+_[ft])'
+FCD_OPT=0
+DQT_OPT=0
+DAB_OPT=0
+while [ -z "${1##-*}" ]; do
+  case "$1" in
+    # Force particular styles, dropping suggested defaults.
+    -L|-linux) INDENT_ARGS="-linux" ;;
+    -K|-kr) INDENT_ARGS="-kr" ;;
+    -G|-gnu) INDENT_ARGS="-gnu" ;;
+    -B|-orig) INDENT_ARGS="-orig" ;;
+    # Reformat existing blank lines and linebreaks.
+    -R) INDENT_ARGS="${INDENT_ARGS} -sob --ignore-newlines" ;;
+    # Reformat all comments, including block comments.
+    -C) INDENT_ARGS="${INDENT_ARGS} -fc1 -fca" ;;
+    # Enable/disable Doxygen comment reformatting.
+    -fcd|--format-doxygen-comments) FCD_OPT=1 ;;
+    -nfcd|--dont-format-doxygen-comments) FCD_OPT=0 ;;
+    # Select Doxygen JavaDoc or Qt style.
+    -dqt|--doxygen-use-qt) DQT_OPT=1 ;;
+    -ndqt|--doxygen-use-javadoc) DQT_OPT=0 ;;
+    # Enable/Disable Doxygen autobrief support.
+    -dab|--doxygen-autobrief) DAB_OPT=1 ;;
+    -ndab|--no-doxygen-autobrief) DAB_OPT=0 ;;
+    # Add userdefined types with support for regexes.
+    -T) if [[ "$@" =~ /.*/ ]]; then
+          TYPE_RE="${TYPE_RE}|($2)";
+	else
+	  INDENT_ARGS="${INDENT_ARGS} $1 $2";
+	fi;
+	shift ;;
+    # Append any other indent formating args.
+    *) INDENT_ARGS="${INDENT_ARGS} $1" ;;
+  esac
+  shift
+done
+
+# Make sure TYPE_RE is bracketed and make a CAST_RE with it.
+TYPE_RE="(${TYPE_RE})"
+CAST_RE="(\\(${TYPE_RE}( \\*+)?\\))"
+# Non-block-comment regexes.
+CMT_BEG='^(.*)/\*(([^*=-_]|$)([^*]|[*]+([^*/]|$))*)$'
+CMT_STR='^(\s*)\*( .*|)$'
+CMT_END='^(.*)\*/(.*)$'
+# Comment-delimiters-on-blank-lines regexes.
+CDB_BEG='^(.*)(/\*[!]?)\s*$'
+CDB_END='^(\s*)\*/\s*$'
+
+# Convert Doxygen comments to '/*!' or '/**' depending on FCD_OPT to
+# enable/disable formatting. We always format Doxygen '/**<' member
+# comments so they indent correctly.
+if [ $FCD_OPT == 1 ]; then
+  sed -r -i 's:/\*\*([ <]|$):/*!\1:' "$@"
+else
+  sed -r -i 's:/\*!( |$):/**\1:; s:/\*\*<:/*!<:' "$@"
+fi
+
+# Strip leading '*'s from comments. They will be re-added by indent if using -sc.
+sed -r -i "
+\\:${CMT_BEG}:,\\:${CMT_END}: {
+  s:${CMT_STR}:\\1 \\2:
+}" "$@"
+
+# Suck in comment delimiters on blank lines. They will be moved back by indent if using -cdb.
+sed -r -i "
+\\:${CDB_BEG}: {
+  N; s:(/\\*[!]?)\\s+:\\1 :;
+}" "$@"
+sed -r -i "
+\\:${CMT_BEG}:,\\:${CMT_END}: {
+  \\:${CMT_BEG}: { h; d; };
+  \\:${CMT_END}:! x;
+  \\:${CDB_END}: { H; g; s:\\n\\s*: :; p; d; };
+  \\:${CMT_END}: { x; p; g; };
+}" "$@"
+
+# Add/Remove Doxygen \brief tags depending on DAB_OPT and DQT_OPT.
+if [ $DAB_OPT == 1 ]; then
+  sed -r -i 's:/\*! [\\@]brief :/*! :' "$@"
+elif [ $DQT_OPT == 1 ]; then
+  sed -r -i 's:/\*! ([^\\@]):/*! @brief \1:' "$@"
+else
+  sed -r -i 's:/\*! ([^\\@]):/*! \\brief \1:' "$@"
+fi
+
+# Tidy code using indent.
+echo Running: indent ${INDENT_ARGS} "$@"
+indent ${INDENT_ARGS} "$@"
+
+# Remove struct prefix from userdefined types.
+# indent adds these when the struct and type has the same name.
+# Things like libev uses the same name for the type and struct.
+# sed -r -i "s:struct (${TYPE_RE} ):\\1:g" "$@"
+
+# Remove space between * or & and identifier after userdefined types.
+# There is no indent argument for this, it always does it for known types.
+# int f(my_t * o); -> int f(my_t *o);
+sed -r -i "s:((${TYPE_RE}|${CAST_RE}) (&|\\*+)) :\\1:g" "$@"
+
+# Remove space after type cast using userdefined types.
+# This manually implements -ncs for userdefined types.
+# a = f((my_t) o); -> a = f((my_t)o);
+if [[ "${INDENT_ARGS}" =~ -linux|-ncs && "${INDENT_ARGS}" != *-cs* ]]; then
+  sed -r -i "s:(${CAST_RE}) :\\1:g" "$@"
+fi
+
+# Repair Doxygen '/*!' comments and trim trailing whitespace added by -sc.
+sed -r -i "
+\\:${CDB_BEG}: {
+  N; s:(/\\*)\\s*\\n(\\s+(\\* )?)! :\\1!\\n\\2:;
+};
+s:/\\* !:/*!:;
+s:\s+$::
+" "$@"
+
+# Convert Doxygen comments to JavaDoc or Qt style depending on DJD_OPT.
+if [ $DQT_OPT == 1 ]; then
+  sed -r -i 's:/\*\*:/*!:' "$@"
+else
+  sed -r -i 's:/\*\!:/**:' "$@"
+fi
