@@ -66,6 +66,10 @@ string constants etc.
 Contents
 ========
 
+This is a pretty random collection of little scripts and data files
+accumulated during the research and development of the ``tidyc``
+script.
+
 =========== ======================================================
 Name        Description
 =========== ======================================================
@@ -124,22 +128,22 @@ following additions;
    -nfcd, --dont-format-doxygen-comments
        Disable Doxygen comment formatting. This will disable all
        reformatting of doxygen comments.
-    -dqt, --doxygen-use-qt
+   -dqt, --doxygen-use-qt
        Select Doxygen Qt or JavaDoc style comments. This adjusts the
        Doxygen starting comment delimiter.
-    -ndqt, --doxygen-use-javadoc
+   -ndqt, --doxygen-use-javadoc
        Select Doxygen JavaDoc style comments.
-    -dab, --doxygen-autobrief
-        Enable Doxygen autobrief support. This will remove \brief or
-	@brief tags from the first line of Doxygen comments
-    -ndab, --no-doxygen-autobrief
-        Disable Doxygen autobrief support. This will add \brief or
-	@brief tags depending on ``-dqt`` to the first line of Doxygen
-	comments.
-    -T <regex>
-        Like indent's ``-T`` except adds support for using extended
-	regexes like ``/ev_\w+/`` to match types like ``ev_event``. Note
-	that ``/w+_t/`` is already included by default.
+   -dab, --doxygen-autobrief
+       Enable Doxygen autobrief support. This will remove \brief or
+       @brief tags from the first line of Doxygen comments
+   -ndab, --no-doxygen-autobrief
+       Disable Doxygen autobrief support. This will add \brief or
+       @brief tags depending on ``-dqt`` to the first line of Doxygen
+       comments.
+   -T <regex>
+       Like indent's ``-T`` except adds support for using extended
+       regexes like ``/ev_\w+/`` to match types like ``ev_event``. Note
+       that ``/w+_t/`` is already included by default.
 
 Support
 =======
