@@ -81,6 +81,7 @@ kr.args     Equivalent -kr args sorted for easy comparison.
 gnu.args    Equivalent -gnu args sorted for easy comparison.
 orig.args   Equivalent -orig args sorted for easy comparison.
 test.c      Source file for testing with.
+test-*.c    Source files for particular test cases.
 tidyc       The script for tidying C source code.
 =========== ======================================================
 
