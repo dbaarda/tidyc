@@ -46,7 +46,7 @@ while [ -z "${1##-*}" ]; do
     -ndab|--no-doxygen-autobrief) DAB_OPT=0 ;;
     # Add userdefined types with support for regexes.
     -T) if [[ "$@" =~ /.*/ ]]; then
-          TYPE_RE="${TYPE_RE}|($2)";
+          TYPE_RE="${TYPE_RE}|(${2:1:-1})";
 	else
 	  INDENT_ARGS="${INDENT_ARGS} $1 $2";
 	fi;
