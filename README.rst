@@ -35,28 +35,33 @@ addresses several issues indent has, including:
 6. Always removes and never adds any trailing whitespace (indent adds
    a trailing space after blank lines in starred comments).
 
-7. Better Doxygen comment support with optinal reformating for both
+7. Better Doxygen comment support with optional reformating for both
    JavaDoc and Qt style comments that doesn't break Qt style ``/*!``
    delimiters, and correctly indents JavaDoc style ``/**<`` member
    comments.
 
-8.  Adds ``-fcd`` and ``-nfcd`` options to enable/disable Doxygen
-    comment formatting that includes reindenting, starring/unstarring
-    with ``-sc`` or ``-nsc``, rebracketing with ``-cdb`` or ``-ncdb``,
-    and reformatting with ``-fca`` and ``-fc1``.
+8. Adds ``-fcd`` and ``-nfcd`` options to enable/disable Doxygen
+   comment formatting that includes reindenting, starring/unstarring
+   with ``-dsc`` or ``-ndsc``, rebracketing with ``-cdb`` or ``-ncdb``,
+   and reformatting with ``-fca`` and ``-fc1``.
 
-9. Adds ``-dqt`` and ``-ndqt`` to select Doxygen Qt or JavaDoc style
+9. Adds ``-dsc`` and ``-ndsc`` options to add/remove starring for
+   Doxygen comments independently of ``-sc`` or ``-nsc`` for non-Doxygen
+   comments. Note ``-fcd`` must be set to enable these.
+
+10. Adds ``-dqt`` and ``-ndqt`` to select Doxygen Qt or JavaDoc style
    comments. Comment delimiters will be changed to match the preferred
    style.
 
-10. Add ``-dab`` and ``-ndab`` options to enable/disable Doxygen
+11. Add ``-dab`` and ``-ndab`` options to enable/disable Doxygen
     AUTOBRIEF support, removing or adding ``\brief`` tags to the first
     line of Doxygen comments.
 
-11. Adds some convenient shortcuts like ``-C`` for ``-fc1 -fca`` and
+12. Adds some convenient shortcuts like ``-C`` for ``-fc1 -fca -fcd`` and
     ``-R`` for ``-sob --ignore-newlines``.
 
-12. Has my preferred defaults which is mostly linux without tabs.
+13. Has my preferred defaults which is mostly linux without tabs and
+    with starred autobrief JavaDoc Doxygen comments.
 
 This is all implemented by doing pre and post processing with sed, so
 is potentially vulnerable to tripping over comment delimiters inside
@@ -123,12 +128,18 @@ following additions;
    -R  Reformat lines breaks. Equivalent to ``-sob --ignore-newlines``.
    -fcd, --format-doxygen-comments
        Enable Doxygen comment formatting. This will enable indenting,
-       starring/unstaring based on -sc|-nsc, rebracketing with/without
+       starring/unstaring based on -dsc|-ndsc, rebracketing with/without
        blank-line delimiters based on -cdb|-ncdb, and content
        reformating with -fca.
    -nfcd, --dont-format-doxygen-comments
        Disable Doxygen comment formatting. This will disable all
        reformatting of doxygen comments.
+   -dsc, --star-doxygen-comments
+       Enable starring of doxygen comments. This will add star prefixes
+       to doxygen comment lines with -fcd.
+   -ndsc, --dont-star-doxygen-comments
+       Disable starring of doxygen comments. This will remove star prefixes
+       from doxygen comment lines with -fcd.
    -dqt, --doxygen-use-qt
        Select Doxygen Qt or JavaDoc style comments. This adjusts the
        Doxygen starting comment delimiter.

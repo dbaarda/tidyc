@@ -21,23 +21,31 @@ INDENT_ARGS='-linux -nut -i4 -ppi2 -l120 -lc80 -fc1'
 # following regex to match user-defined types. This is the default, and
 # additional regexes can be added using "-T /regex/" arguments.
 TYPE_RE='(ev_\w+)|(\w+_[ft])'
+SC_OPT=0
 FCD_OPT=0
+DSC_OPT=1
 DQT_OPT=0
-DAB_OPT=0
+DAB_OPT=1
 while [ -z "${1##-*}" ]; do
   case "$1" in
     # Force particular styles, dropping suggested defaults.
     -L|-linux) INDENT_ARGS="-linux" ;;
     -K|-kr) INDENT_ARGS="-kr" ;;
     -G|-gnu) INDENT_ARGS="-gnu" ;;
-    -B|-orig) INDENT_ARGS="-orig" ;;
+    -B|-orig) INDENT_ARGS="-orig" SC_OPT=1 ;;
     # Reformat existing blank lines and linebreaks.
     -R) INDENT_ARGS="${INDENT_ARGS} -sob --ignore-newlines" ;;
-    # Reformat all comments, including block comments.
-    -C) INDENT_ARGS="${INDENT_ARGS} -fc1 -fca" ;;
+    # Reformat all comments, including docbook comments.
+    -C) INDENT_ARGS="${INDENT_ARGS} -fc1 -fca" FCD_OPT=1;;
+    # Enable/disable star comments.
+    -sc|--star-comments) SC_OPT=1 ;;
+    -nsc|--dont-star-comments) SC_OPT=0 ;;
     # Enable/disable Doxygen comment reformatting.
     -fcd|--format-doxygen-comments) FCD_OPT=1 ;;
     -nfcd|--dont-format-doxygen-comments) FCD_OPT=0 ;;
+    # Enable/disable star comments for Doxygen.
+    -dsc|--star-doxygen-comments) DSC_OPT=1 ;;
+    -ndsc|--dont-star-doxygen-comments) DSC_OPT=0 ;;
     # Select Doxygen JavaDoc or Qt style.
     -dqt|--doxygen-use-qt) DQT_OPT=1 ;;
     -ndqt|--doxygen-use-javadoc) DQT_OPT=0 ;;
@@ -56,6 +64,12 @@ while [ -z "${1##-*}" ]; do
   esac
   shift
 done
+# Add -sc to INDENT_ARGS if any type of comment needs it;
+if [[ $SC_OPT == 1 || $DSC_OPT == 1 ]]; then
+  INDENT_ARGS="${INDENT_ARGS} -sc" ;
+else
+   INDENT_ARGS="${INDENT_ARGS} -nsc" ;
+fi
 
 # Make sure TYPE_RE is bracketed and make a CAST_RE with it.
 TYPE_RE="(${TYPE_RE})"
@@ -67,6 +81,10 @@ CMT_END='^(.*)\*/(.*)$'
 # Comment-delimiters-on-blank-lines regexes.
 CDB_BEG='^(.*)(/\*[!]?)\s*$'
 CDB_END='^(\s*)\*/\s*$'
+# Comment-delimiter for formated non-docbook comments.
+NDB_BEG='^(.*)/\*(([^*=-_!]|$)([^*]|[*]+([^*/]|$))*)$'
+# Comment-delimiter for formated docbook comments.
+FDB_BEG='^(.*)/\*!(([^*]|[*]+([^*/]|$))*)$'
 
 # Convert Doxygen comments to '/*!' or '/**' depending on FCD_OPT to
 # enable/disable formatting. We always format Doxygen '/**<' member
@@ -134,6 +152,22 @@ sed -r -i "
 s:/\\* !:/*!:;
 s:\s+$::
 " "$@"
+
+# For -nsc, strip leading '*'s from formated non-docbook comments.
+if [[ $SC_OPT == 0 && $DSC_OPT == 1 ]]; then
+  sed -r -i "\\:${NDB_BEG}:,\\:${CMT_END}: {
+    s:${CMT_STR}:\\1 \\2:;
+    s:\s+$::
+  }" "$@"
+fi
+
+# For -ndsc, strip leading '*'s from formated docbook comments.
+if [[ $SC_OPT == 1 && $DSC_OPT == 0 ]]; then
+  sed -r -i "\\:${FDB_BEG}:,\\:${CMT_END}: {
+    s:${CMT_STR}:\\1 \\2:;
+    s:\s+$::
+  }" "$@"
+fi
 
 # Convert Doxygen comments to JavaDoc or Qt style depending on DJD_OPT.
 if [ $DQT_OPT == 1 ]; then
