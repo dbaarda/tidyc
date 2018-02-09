@@ -40,7 +40,7 @@ addresses several issues indent has, including:
    delimiters, and correctly indents JavaDoc style ``/**<`` member
    comments.
 
-8. Never reformats anything inside ``\code``...``\endcode`` blocks inside
+8. Never reformats anything inside ``\code...\endcode`` blocks inside
    Doxygen comments.
 
 9. Adds ``-fcd`` and ``-nfcd`` options to enable/disable Doxygen
@@ -122,7 +122,7 @@ following additions;
    -K  Resets settings to ``-kr``.
    -G  Resets settings to ``-gnu``.
    -B  Resets settings to ``-orig``.
-   -C  Reformat comments. Equivalent to ``-fc1 -fca``.
+   -C  Reformat comments. Equivalent to ``-fc1 -fca -fcd``.
    -R  Reformat lines breaks. Equivalent to ``-sob --ignore-newlines``.
    -fcd, --format-doxygen-comments
        Enable Doxygen comment formatting. This will enable indenting,
@@ -164,7 +164,7 @@ The following are the currently known issues;
    is potentially vulnerable to tripping over comment delimiters inside
    string constants etc.
 
-2. The contents of ``\code``...``\endcode`` blocks in Doxygen comments are
+2. The contents of ``\code...\endcode`` blocks in Doxygen comments are
    never formatted in any way. This includes starring, unstarring,
    indenting or reformatting. This can result in strange different
    starred/unstarred or indented/unindented sections in the middle of
@@ -172,12 +172,12 @@ The following are the currently known issues;
    the surrounding comment. After this reformatting will produce the
    correct result.
 
-3. Incorrectly indented ``\code``...``\endcode`` blocks in Doxygen comments
+3. Incorrectly indented ``\code...\endcode`` blocks in Doxygen comments
    will mess with the indenting of the rest of the comment after the
    code block. Manually correcting the indenting of the code block and
    reformatting will produce the correct result.
 
-4. Paragraphs with embedded ``\code``...``\endcode`` blocks will mess with
+4. Paragraphs with embedded ``\code...\endcode`` blocks will mess with
    paragraph reformatting, resulting in long lines that include the
    code block. Don't do that.
 
