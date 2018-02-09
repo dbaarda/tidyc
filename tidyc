@@ -95,6 +95,15 @@ else
   sed -r -i 's:/\*!( |$):/**\1:; s:/\*\*<:/*!<:' "$@"
 fi
 
+# Make \code...\endcode blocks inside Doxygen comments immutable.
+if [ $FCD_OPT == 1 ]; then
+  sed -r -i "\\:${FDB_BEG}:,\\:${CMT_END}: {"'
+    s:\\code:\\code */\n/** \\code:;
+    s:^(((\s*) [ *] )?.*)\\endcode:\1\\endcode */\n\3/*! \\endcode:;
+  }
+  ' "$@"
+fi
+
 # Strip leading '*'s from comments. They will be re-added by indent if using -sc.
 sed -r -i "
 \\:${CMT_BEG}:,\\:${CMT_END}: {
@@ -167,6 +176,16 @@ if [[ $SC_OPT == 1 && $DSC_OPT == 0 ]]; then
     s:${CMT_STR}:\\1 \\2:;
     s:\s+$::
   }" "$@"
+fi
+
+# Remove immutable comment wrappers around \code..\endcode blocks.
+if [ $FCD_OPT == 1 ]; then
+  sed -r -i '\:\\code: {
+    N; N; s:\\code\s*\*/\n/\*\* \\code:\\code:;
+  };
+  \:\\endcode \*/: {
+    N; N; s:\\endcode \*/\n\s*/\*!(\s*[ *])? \\endcode:\\endcode:;
+  }' "$@"
 fi
 
 # Convert Doxygen comments to JavaDoc or Qt style depending on DJD_OPT.

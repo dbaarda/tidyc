@@ -40,33 +40,31 @@ addresses several issues indent has, including:
    delimiters, and correctly indents JavaDoc style ``/**<`` member
    comments.
 
-8. Adds ``-fcd`` and ``-nfcd`` options to enable/disable Doxygen
+8. Never reformats anything inside ``\code``...``\endcode`` blocks inside
+   Doxygen comments.
+
+9. Adds ``-fcd`` and ``-nfcd`` options to enable/disable Doxygen
    comment formatting that includes reindenting, starring/unstarring
    with ``-dsc`` or ``-ndsc``, rebracketing with ``-cdb`` or ``-ncdb``,
    and reformatting with ``-fca`` and ``-fc1``.
 
-9. Adds ``-dsc`` and ``-ndsc`` options to add/remove starring for
-   Doxygen comments independently of ``-sc`` or ``-nsc`` for non-Doxygen
-   comments. Note ``-fcd`` must be set to enable these.
+10. Adds ``-dsc`` and ``-ndsc`` options to add/remove starring for
+    Doxygen comments independently of ``-sc`` or ``-nsc`` for non-Doxygen
+    comments. Note ``-fcd`` must be set to enable these.
 
-10. Adds ``-dqt`` and ``-ndqt`` to select Doxygen Qt or JavaDoc style
-   comments. Comment delimiters will be changed to match the preferred
-   style.
+11. Adds ``-dqt`` and ``-ndqt`` to select Doxygen Qt or JavaDoc style
+    comments. Comment delimiters will be changed to match the preferred
+    style.
 
-11. Add ``-dab`` and ``-ndab`` options to enable/disable Doxygen
+12. Add ``-dab`` and ``-ndab`` options to enable/disable Doxygen
     AUTOBRIEF support, removing or adding ``\brief`` tags to the first
     line of Doxygen comments.
 
-12. Adds some convenient shortcuts like ``-C`` for ``-fc1 -fca -fcd`` and
+13. Adds some convenient shortcuts like ``-C`` for ``-fc1 -fca -fcd`` and
     ``-R`` for ``-sob --ignore-newlines``.
 
-13. Has my preferred defaults which is mostly linux without tabs and
+14. Has my preferred defaults which is mostly linux without tabs and
     with starred autobrief JavaDoc Doxygen comments.
-
-This is all implemented by doing pre and post processing with sed, so
-is potentially vulnerable to tripping over comment delimiters inside
-string constants etc.
-
 
 Contents
 ========
@@ -128,18 +126,18 @@ following additions;
    -R  Reformat lines breaks. Equivalent to ``-sob --ignore-newlines``.
    -fcd, --format-doxygen-comments
        Enable Doxygen comment formatting. This will enable indenting,
-       starring/unstaring based on -dsc|-ndsc, rebracketing with/without
-       blank-line delimiters based on -cdb|-ncdb, and content
-       reformating with -fca.
+       starring/unstaring based on ``-dsc|-ndsc``, rebracketing with/without
+       blank-line delimiters based on ``-cdb|-ncdb``, and content
+       reformating with ``-fca``.
    -nfcd, --dont-format-doxygen-comments
        Disable Doxygen comment formatting. This will disable all
        reformatting of doxygen comments.
    -dsc, --star-doxygen-comments
        Enable starring of doxygen comments. This will add star prefixes
-       to doxygen comment lines with -fcd.
+       to doxygen comment lines with ``-fcd``.
    -ndsc, --dont-star-doxygen-comments
        Disable starring of doxygen comments. This will remove star prefixes
-       from doxygen comment lines with -fcd.
+       from doxygen comment lines with ``-fcd``.
    -dqt, --doxygen-use-qt
        Select Doxygen Qt or JavaDoc style comments. This adjusts the
        Doxygen starting comment delimiter.
@@ -156,6 +154,40 @@ following additions;
        Like indent's ``-T`` except adds support for using extended
        regexes like ``/ev_\w+/`` to match types like ``ev_event``. Note
        that ``/w+_t/`` is already included by default.
+
+Issues
+======
+
+The following are the currently known issues;
+
+1. This is all implemented by doing pre and post processing with sed, so
+   is potentially vulnerable to tripping over comment delimiters inside
+   string constants etc.
+
+2. The contents of ``\code``...``\endcode`` blocks in Doxygen comments are
+   never formatted in any way. This includes starring, unstarring,
+   indenting or reformatting. This can result in strange different
+   starred/unstarred or indented/unindented sections in the middle of
+   Doxygen comments. These code blocks must be manually edited to match
+   the surrounding comment. After this reformatting will produce the
+   correct result.
+
+3. Incorrectly indented ``\code``...``\endcode`` blocks in Doxygen comments
+   will mess with the indenting of the rest of the comment after the
+   code block. Manually correcting the indenting of the code block and
+   reformatting will produce the correct result.
+
+4. Paragraphs with embedded ``\code``...``\endcode`` blocks will mess with
+   paragraph reformatting, resulting in long lines that include the
+   code block. Don't do that.
+
+5. Each sed or indent stage does in-place edits of the file, so errors
+   in any stage, including invalid arguments for indent, will result in a
+   partially messed up file. Make sure you have checked code in so you
+   can restore it before using this.
+
+6. It's not at all optimized, and runs multiple sed cmds for various
+   transformations that could possibly be done in single runs.
 
 Support
 =======
