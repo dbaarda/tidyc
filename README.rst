@@ -144,11 +144,11 @@ following additions;
    -ndqt, --doxygen-use-javadoc
        Select Doxygen JavaDoc style comments.
    -dab, --doxygen-autobrief
-       Enable Doxygen autobrief support. This will remove \brief or
-       @brief tags from the first line of Doxygen comments
+       Enable Doxygen autobrief support. This will remove ``\brief`` or
+       ``@brief`` tags from the first line of Doxygen comments
    -ndab, --no-doxygen-autobrief
-       Disable Doxygen autobrief support. This will add \brief or
-       @brief tags depending on ``-dqt`` to the first line of Doxygen
+       Disable Doxygen autobrief support. This will add ``\brief`` or
+       ``@brief`` tags depending on ``-dqt`` to the first line of Doxygen
        comments.
    -T <regex>
        Like indent's ``-T`` except adds support for using extended
