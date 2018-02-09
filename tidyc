@@ -95,7 +95,7 @@ else
   sed -r -i 's:/\*!( |$):/**\1:; s:/\*\*<:/*!<:' "$@"
 fi
 
-# Make \code...\endcode blocks inside Doxygen comments immutable.
+# Wrap Doxygen \code...\endcode blocks in immutable block comments.
 if [ $FCD_OPT == 1 ]; then
   sed -r -i "\\:${FDB_BEG}:,\\:${CMT_END}: {"'
     s:\\code:\\code */\n/** \\code:;
@@ -104,24 +104,22 @@ if [ $FCD_OPT == 1 ]; then
   ' "$@"
 fi
 
-# Strip leading '*'s from comments. They will be re-added by indent if using -sc.
-sed -r -i "
-\\:${CMT_BEG}:,\\:${CMT_END}: {
-  s:${CMT_STR}:\\1 \\2:
-}" "$@"
-
-# Suck in comment delimiters on blank lines. They will be moved back by indent if using -cdb.
-sed -r -i "
-\\:${CDB_BEG}: {
-  N; s:(/\\*[!]?)\\s+:\\1 :;
-}" "$@"
+# Strip leading '*'s from comments and suck in comment delimiters on
+# blank lines. They will be re-added by indent if using -sc or -cdb.
 sed -r -i "
 \\:${CMT_BEG}:,\\:${CMT_END}: {
   \\:${CMT_BEG}: { h; d; };
-  \\:${CMT_END}:! x;
-  \\:${CDB_END}: { H; g; s:\\n\\s*: :; p; d; };
-  \\:${CMT_END}: { x; p; g; };
-}" "$@"
+  \\:${CMT_END}:! {
+    s:${CMT_STR}:\\1 \\2:
+    H; d;
+  };
+  \\:${CMT_END}: {
+    s:${CMT_STR}:\\1 \\2:
+    H; x;"'
+    s:(/\*!?)\s*:\1 :;
+    s:\s*\*/: */:
+  };
+}' "$@"
 
 # Add/Remove Doxygen \brief tags depending on DAB_OPT and DQT_OPT.
 if [ $DAB_OPT == 1 ]; then
@@ -178,7 +176,7 @@ if [[ $SC_OPT == 1 && $DSC_OPT == 0 ]]; then
   }" "$@"
 fi
 
-# Remove immutable comment wrappers around \code..\endcode blocks.
+# Remove immutable block comment wrappers around \code..\endcode blocks.
 if [ $FCD_OPT == 1 ]; then
   sed -r -i '\:\\code: {
     N; N; s:\\code\s*\*/\n/\*\* \\code:\\code:;
