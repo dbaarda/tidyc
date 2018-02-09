@@ -78,9 +78,6 @@ CAST_RE="(\\(${TYPE_RE}( \\*+)?\\))"
 CMT_BEG='^(.*)/\*(([^*=-_]|$)([^*]|[*]+([^*/]|$))*)$'
 CMT_STR='^(\s*)\*( .*|)$'
 CMT_END='^(.*)\*/(.*)$'
-# Comment-delimiters-on-blank-lines regexes.
-CDB_BEG='^(.*)(/\*[!]?)\s*$'
-CDB_END='^(\s*)\*/\s*$'
 # Comment-delimiter for formated non-docbook comments.
 NDB_BEG='^(.*)/\*(([^*=-_!]|$)([^*]|[*]+([^*/]|$))*)$'
 # Comment-delimiter for formated docbook comments.
@@ -116,8 +113,8 @@ sed -r -i "
   \\:${CMT_END}: {
     s:${CMT_STR}:\\1 \\2:
     H; x;"'
-    s:(/\*!?)\s*:\1 :;
-    s:\s*\*/: */:
+    s:(/\*!?)\s+:\1 :;
+    s:\s+\*/: */:
   };
 }' "$@"
 
@@ -153,12 +150,13 @@ fi
 
 # Repair Doxygen '/*!' comments and trim trailing whitespace added by -sc.
 sed -r -i "
-\\:${CDB_BEG}: {
-  N; s:(/\\*)\\s*\\n(\\s+(\\* )?)! :\\1!\\n\\2:;
+\\:${CMT_BEG}: {"'
+  N;
+  s:/\*\s*\n(\s+(\* )?)! :/*!\n\1:;
 };
-s:/\\* !:/*!:;
+s:/\* !:/*!:;
 s:\s+$::
-" "$@"
+' "$@"
 
 # For -nsc, strip leading '*'s from formated non-docbook comments.
 if [[ $SC_OPT == 0 && $DSC_OPT == 1 ]]; then
