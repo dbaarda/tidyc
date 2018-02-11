@@ -26,7 +26,7 @@ FCD_OPT=0
 DSC_OPT=1
 DQT_OPT=0
 DAB_OPT=1
-IEX_OPT=1
+IEC_OPT=1
 while [ -z "${1##-*}" ]; do
   case "$1" in
     # Force particular styles, dropping suggested defaults.
@@ -53,9 +53,9 @@ while [ -z "${1##-*}" ]; do
     # Enable/Disable Doxygen autobrief support.
     -dab|--doxygen-autobrief) DAB_OPT=1 ;;
     -ndab|--no-doxygen-autobrief) DAB_OPT=0 ;;
-    # Enable/Disable ignore extern statements for indenting.
-    -iex|--ignore-extern) IEX_OPT=1 ;;
-    -niex|--dont-ignore-extern) IEX_OPT=0 ;;
+    # Enable/Disable ignore extern "C" statements for indenting.
+    -iec|--ignore-extern-c) IEC_OPT=1 ;;
+    -niec|--dont-ignore-extern-c) IEC_OPT=0 ;;
     # Add userdefined types with support for regexes.
     -T) if [[ "$@" =~ /.*/ ]]; then
           TYPE_RE="${TYPE_RE}|(${2:1:-1})";
@@ -128,19 +128,29 @@ else
   sed -r -i 's:/\*! ([^\\@]):/*! \\brief \1:' "$@"
 fi
 
-# For -iex comment out extern statements;
-if [ $IEX_OPT == 1 ]; then
+# For -iec comment out extern "C" {...} wrappers.
+if [ $IEC_OPT == 1 ]; then
   sed -r -i '
   $! { H; d; };
   $ {
     H; x;
-    s:^(.*\n)(extern [^{]*\{)(.*\n)(\})([^}]*)$:\1/*=\2=*/\3/*=\4=*/\5:;
+    s:^(.*\n)(extern "C" \{)(.*\n)(\})([^}]*)$:\1/*=\2=*/\3/*=\4=*/\5:;
   }' "$@"
 fi
-
+exit 1
 # Tidy code using indent.
 echo Running: indent ${INDENT_ARGS} "$@"
 indent ${INDENT_ARGS} "$@"
+
+# For -iec restore commented out extern "C" {...} wrappers.
+if [ $IEC_OPT == 1 ]; then
+  sed -r -i '
+  $! {H; d};
+  $ {
+    H; x;
+    s:^(.*\n)/\*=(extern "C" \{)=\*/(.*\n)/\*=(\})=\*/([^}]*)$:\1\2\3\4\5:;
+  }' "$@"
+fi
 
 # Remove struct prefix from userdefined types.
 # indent adds these when the struct and type has the same name.
@@ -200,14 +210,4 @@ if [ $DQT_OPT == 1 ]; then
   sed -r -i 's:/\*\*:/*!:' "$@"
 else
   sed -r -i 's:/\*\!:/**:' "$@"
-fi
-
-# For -iex restore commented out extern statements;
-if [ $IEX_OPT == 1 ]; then
-  sed -r -i '
-  $! {H; d};
-  $ {
-    H; x;
-    s:^(.*\n)/\*=(extern [^{]*\{)=\*/(.*\n)/\*=(\})=\*/([^}]*)$:\1\2\3\4\5:;
-  }' "$@"
 fi
