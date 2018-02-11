@@ -137,7 +137,7 @@ if [ $IEC_OPT == 1 ]; then
     s:^(.*\n)(extern "C" \{)(.*\n)(\})([^}]*)$:\1/*=\2=*/\3/*=\4=*/\5:;
   }' "$@"
 fi
-exit 1
+
 # Tidy code using indent.
 echo Running: indent ${INDENT_ARGS} "$@"
 indent ${INDENT_ARGS} "$@"
