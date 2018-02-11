@@ -26,6 +26,7 @@ FCD_OPT=0
 DSC_OPT=1
 DQT_OPT=0
 DAB_OPT=1
+IEX_OPT=1
 while [ -z "${1##-*}" ]; do
   case "$1" in
     # Force particular styles, dropping suggested defaults.
@@ -52,6 +53,9 @@ while [ -z "${1##-*}" ]; do
     # Enable/Disable Doxygen autobrief support.
     -dab|--doxygen-autobrief) DAB_OPT=1 ;;
     -ndab|--no-doxygen-autobrief) DAB_OPT=0 ;;
+    # Enable/Disable ignore extern statements for indenting.
+    -iex|--ignore-extern) IEX_OPT=1 ;;
+    -niex|--dont-ignore-extern) IEX_OPT=0 ;;
     # Add userdefined types with support for regexes.
     -T) if [[ "$@" =~ /.*/ ]]; then
           TYPE_RE="${TYPE_RE}|(${2:1:-1})";
@@ -92,11 +96,11 @@ else
   sed -r -i 's:/\*!( |$):/**\1:; s:/\*\*<:/*!<:' "$@"
 fi
 
-# Wrap Doxygen \code...\endcode blocks in immutable block comments.
+# Wrap Doxygen \code...\endcode blocks in immutable /*=...=*/ comments.
 if [ $FCD_OPT == 1 ]; then
   sed -r -i "\\:${FDB_BEG}:,\\:${CMT_END}: {"'
-    s:\\code:\\code */\n/** \\code:;
-    s:^(((\s*) [ *] )?.*)\\endcode:\1\\endcode */\n\3/*! \\endcode:;
+    s:\\code:\\code */\n/*=\\code:;
+    s:^(((\s*) [ *] )?.*)\\endcode:\1\\endcode=*/\n\3/*! \\endcode:;
   }
   ' "$@"
 fi
@@ -106,13 +110,10 @@ fi
 sed -r -i "
 \\:${CMT_BEG}:,\\:${CMT_END}: {
   \\:${CMT_BEG}: { h; d; };
-  \\:${CMT_END}:! {
-    s:${CMT_STR}:\\1 \\2:
-    H; d;
-  };
-  \\:${CMT_END}: {
-    s:${CMT_STR}:\\1 \\2:
-    H; x;"'
+  s:${CMT_STR}:\\1 \\2:
+  \\:${CMT_END}:! { H; d; };
+  \\:${CMT_END}: {"'
+    H; x;
     s:(/\*!?)\s+:\1 :;
     s:\s+\*/: */:
   };
@@ -125,6 +126,16 @@ elif [ $DQT_OPT == 1 ]; then
   sed -r -i 's:/\*! ([^\\@]):/*! @brief \1:' "$@"
 else
   sed -r -i 's:/\*! ([^\\@]):/*! \\brief \1:' "$@"
+fi
+
+# For -iex comment out extern statements;
+if [ $IEX_OPT == 1 ]; then
+  sed -r -i '
+  $! { H; d; };
+  $ {
+    H; x;
+    s:^(.*\n)(extern [^{]*\{)(.*\n)(\})([^}]*)$:\1/*=\2=*/\3/*=\4=*/\5:;
+  }' "$@"
 fi
 
 # Tidy code using indent.
@@ -174,13 +185,13 @@ if [[ $SC_OPT == 1 && $DSC_OPT == 0 ]]; then
   }" "$@"
 fi
 
-# Remove immutable block comment wrappers around \code..\endcode blocks.
+# Remove immutable /*=...=*/ comment wrappers around \code..\endcode blocks.
 if [ $FCD_OPT == 1 ]; then
   sed -r -i '\:\\code: {
-    N; N; s:\\code\s*\*/\n/\*\* \\code:\\code:;
+    N; N; s:\\code\s*\*/\n/\*=\\code:\\code:;
   };
-  \:\\endcode \*/: {
-    N; N; s:\\endcode \*/\n\s*/\*!(\s*[ *])? \\endcode:\\endcode:;
+  \:\\endcode: {
+    N; N; s:\\endcode=\*/\n\s*/\*!(\s*[ *])? \\endcode:\\endcode:;
   }' "$@"
 fi
 
@@ -189,4 +200,14 @@ if [ $DQT_OPT == 1 ]; then
   sed -r -i 's:/\*\*:/*!:' "$@"
 else
   sed -r -i 's:/\*\!:/**:' "$@"
+fi
+
+# For -iex restore commented out extern statements;
+if [ $IEX_OPT == 1 ]; then
+  sed -r -i '
+  $! {H; d};
+  $ {
+    H; x;
+    s:^(.*\n)/\*=(extern [^{]*\{)=\*/(.*\n)/\*=(\})=\*/([^}]*)$:\1\2\3\4\5:;
+  }' "$@"
 fi

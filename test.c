@@ -122,6 +122,12 @@ that is too short.
                                              With another
                                              short paragraph. */
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /** A struct.
  *
  * With struct details.
@@ -343,3 +349,7 @@ int bar2(int a)
    */
      return b;
 }
+
+#ifdef __cplusplus
+}
+#endif
