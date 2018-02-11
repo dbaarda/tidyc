@@ -57,7 +57,7 @@ while [ -z "${1##-*}" ]; do
     -iec|--ignore-extern-c) IEC_OPT=1 ;;
     -niec|--dont-ignore-extern-c) IEC_OPT=0 ;;
     # Add userdefined types with support for regexes.
-    -T) if [[ "$@" =~ /.*/ ]]; then
+    -T) if [[ "$2" =~ /.*/ ]]; then
           TYPE_RE="${TYPE_RE}|(${2:1:-1})";
 	else
 	  INDENT_ARGS="${INDENT_ARGS} $1 $2";
