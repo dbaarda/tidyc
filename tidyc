@@ -131,7 +131,8 @@ fi
 # For -iec comment out extern "C" {...} wrappers.
 if [ $IEC_OPT == 1 ]; then
   sed -r -i '
-  $! { H; d; };
+  1 {h; d;};
+  $! {H; d;};
   $ {
     H; x;
     s:^(.*\n)(extern "C" \{)(.*\n)(\})([^}]*)$:\1/*=\2=*/\3/*=\4=*/\5:;
@@ -145,7 +146,8 @@ indent ${INDENT_ARGS} "$@"
 # For -iec restore commented out extern "C" {...} wrappers.
 if [ $IEC_OPT == 1 ]; then
   sed -r -i '
-  $! {H; d};
+  1 {h; d;};
+  $! {H; d;};
   $ {
     H; x;
     s:^(.*\n)/\*=(extern "C" \{)=\*/(.*\n)/\*=(\})=\*/([^}]*)$:\1\2\3\4\5:;
