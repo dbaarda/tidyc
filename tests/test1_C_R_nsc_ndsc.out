@@ -1,0 +1,267 @@
+/** Doxygen javadoc style comment with stars.
+   Here are file details including a very long line that goes well past the
+   line length.
+
+   And it has another paragraph that is too short. */
+
+/** Doxygen Qt style comment with stars.
+   Here are file details including a very long line that goes well past the
+   line length.
+
+   And it has another paragraph that is too short. */
+
+/* A non-javadoc block comment with blank-line delimiters and stars.
+   Here are file details including a very long line that goes well past the
+   line length.
+
+   And it has another paragraph that is too short. */
+
+/* A non-javadoc non-block comment with stars.
+   Here are file details including a very long line that goes well past the
+   line length.
+
+   And it has another paragraph that is too short. */
+
+/** Doxygen javadoc style comment without stars.
+   Here are file details including a very long line that goes well past the
+   line length.
+
+   And it has another paragraph that is too short. */
+
+/** Doxygen Qt style comment without stars.
+   Here are file details including a very long line that goes well past the
+   line length.
+
+   And it has another paragraph that is too short. */
+
+/* A non-javadoc non-block comment with blank-line delimiters and without
+   stars.
+
+   Here are file details including a very long line that goes well past the
+   line length.
+
+   And it has another paragraph that is too short. */
+
+/* A non-javadoc non-block comment without stars.
+   Here are file details including a very long line that goes well past the
+   line length.
+
+   And it has another paragraph that is too short. */
+
+                                            /** here is a wierdly indented
+                                               quote that goes too far over two
+                                               lines.
+
+                                               With another short paragraph. */
+
+                                            /** here is a wierdly indented
+                                               quote that goes too far over two
+                                               lines.
+
+                                               With another short paragraph. */
+
+                                            /* here is a wierdly indented quote 
+                                               that goes too far over two
+                                               lines.
+
+                                               With another short paragraph. */
+
+                                            /* here is a wierdly indented quote 
+                                               that goes too far over two
+                                               lines.
+
+                                               With another short paragraph. */
+
+                                            /** here is a wierdly indented
+                                               quote that goes too far over two
+                                               lines.
+
+                                               With another short paragraph. */
+
+                                            /** here is a wierdly indented
+                                               quote that goes too far over two
+                                               lines.
+
+                                               With another short paragraph. */
+
+                                            /* here is a wierdly indented quote 
+                                               that goes too far over two
+                                               lines.
+
+                                               With another short paragraph. */
+
+                                            /* here is a wierdly indented quote 
+                                               that goes too far over two
+                                               lines.
+
+                                               With another short paragraph. */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/** A struct.
+   With struct details. */
+typedef struct foo {
+    /** a comment that's not indented. */
+
+    /** a comment that's indented */
+
+    int a;                      /**< a short comment. */
+    int b;                      /**< A very long comment that goes way past
+                                   the end of the max line length. */
+    int c;                      /**< A very long comment that goes way past
+                                   the end of the max line length.
+
+                                   With another paragraph that is too short. */
+} foo_t;
+
+/** A struct.
+   With struct details. */
+typedef struct foo {
+    /** a comment that's not indented. */
+
+    /** a comment that's indented */
+
+    int a;                      /**< a short comment. */
+    int b;                      /**< A very long comment that goes way past
+                                   the end of the max line length. */
+    int c;                      /**< A very long comment that goes way past
+                                   the end of the max line length.
+
+                                   With another paragraph that is too short. */
+} foo_t;
+
+/* A struct.
+   With struct details. */
+typedef struct foo {
+    /* a comment that's not indented. */
+
+    /* a comment that's indented */
+
+    int a;                      /* a short comment. */
+    int b;                      /* A very long comment that goes way past the
+                                   end of the max line length. */
+    int c;                      /* A very long comment that goes way past the
+                                   end of the max line length.
+
+                                   With another paragraph that is too short. */
+} foo_t;
+
+/* A struct.
+   With struct details. */
+typedef struct foo {
+    /* a comment that's not indented. */
+
+    /* a comment that's indented */
+
+    int a;                      /* A short comment. */
+    int b;                      /* A very long comment that goes way past the
+                                   end of the max line length. */
+    int c;                      /* A very long comment that goes way past the
+                                   end of the max line length.
+
+                                   With another paragraph that is too short. */
+} foo_t;
+
+/** A struct.
+   With struct details. */
+typedef struct foo {
+    /** a comment that's not indented. */
+
+    /** a comment that's indented */
+
+    int a;                      /** A short comment. */
+    int b;                      /** A very long comment that goes way past the 
+                                   end of the max line length. */
+    int c;                      /** A very long comment that goes way past the 
+                                   end of the max line length.
+
+                                   With another paragraph that is too short. */
+} foo_t;
+
+/** A struct.
+   With struct details. */
+typedef struct foo {
+    /** a comment that's not indented. */
+
+    /** a comment that's indented */
+
+    int a;                      /** A short comment. */
+    int b;                      /** A very long comment that goes way past the 
+                                   end of the max line length. */
+    int c;                      /** A very long comment that goes way past the 
+                                   end of the max line length.
+
+                                   With another paragraph that is too short. */
+} foo_t;
+
+/* A struct.
+   With struct details. */
+typedef struct foo {
+    /* a comment that's not indented. */
+
+    /* a comment that's indented */
+
+    int a;                      /* A short comment. */
+    int b;                      /* A very long comment that goes way past the
+                                   end of the max line length. */
+    int c;                      /* A very long comment that goes way past the
+                                   end of the max line length.
+
+                                   With another paragraph that is too short. */
+} foo_t;
+
+/* A struct.
+   With struct details. */
+typedef struct foo {
+    /* a comment that's not indented. */
+
+    /* a comment that's indented */
+
+    int a;                      /* A short comment. */
+    int b;                      /* A very long comment that goes way past the
+                                   end of the max line length. */
+    int c;                      /* A very long comment that goes way past the
+                                   end of the max line length.
+
+                                   With another paragraph that is too short. */
+} foo_t;
+
+/** A func.
+   With func details.
+
+   @param a [in] an int for a.
+
+   @returns an int for something. */
+int bar(int a)
+{
+    int b;                      /* not doxygen */
+
+    /* Also not doxygen, but rather long and should be a comment that wraps
+       because its so long.
+
+       It also has another paragraph. */
+    return b;
+}
+
+/** A func.
+   With func details.
+
+   @param a [in] an int for a.
+
+   @returns an int for something. */
+int bar2(int a)
+{
+    int b;                      /* not doxygen */
+
+    /* Also not doxygen, but rather long and should be a comment that wraps
+       because its so long.
+
+       It also has another paragraph. */
+    return b;
+}
+
+#ifdef __cplusplus
+}
+#endif

@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Run tests for tidyc.
+#
+# Each test checks the expected output for an input file with particular tidyc
+# arguments. The input file and arguments are encoded in the expected output
+# filename as follows;
+#
+# output: <testX>_arg1_arg2_[...].out
+# input: <testX>.c
+# args: -arg1 -arg2 [...]
+#
+
+# Run a cmd and fail the test if cmd fails.
+run_test () {
+  echo "Running: $@" >&2
+  "$@" || fail_test "returncode=$?"
+}
+
+# Fail the test and exit.
+fail_test () {
+    echo "Failed! $1" >&2
+    exit 2
+}
+
+# Run a test for a given expected output file.
+do_test () {
+  expect="$1"
+  name=${expect%.out}
+  input=${name%%_*}.c
+  output=tests/output.c
+  args="${name//_/ -} "; args=${args#* }
+  cp $input $output
+  run_test ./tidyc $args $output
+  run_test diff -q $expect $output
+  rm -f $output
+}
+
+for expect in tests/*.out; do
+  do_test $expect
+done
