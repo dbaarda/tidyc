@@ -78,138 +78,142 @@ fi
 # Make sure TYPE_RE is bracketed and make a CAST_RE with it.
 TYPE_RE="(${TYPE_RE})"
 CAST_RE="(\\(${TYPE_RE}( \\*+)?\\))"
-# Non-block-comment regexes.
-CMT_BEG='^(.*)/\*(([^*=-_]|$)([^*]|[*]+([^*/]|$))*)$'
-CMT_STR='^(\s*)\*( .*|)$'
+# Comment contents, anything that doesn't include '*/'.
+CMT_MID='(([^*]|[*]+[^*/])*)'
+# Comment start line for formatable comments.
+CMT_BEG='^(.*)/\*([^*=-_]'"${CMT_MID}"')?$'
+# Comment start line for formatable non-docbook comments.
+NDB_BEG='^(.*)/\*([^*=-_!]'"${CMT_MID}"')?$'
+# Comment start line for formatable docbook comments.
+FDB_BEG='^(.*)/\*!'"${CMT_MID}"'?$'
+# Comment contents starred lines.
+CMT_STR='^(\s*)\*( .*)?$'
+# Comment end line.
 CMT_END='^(.*)\*/(.*)$'
-# Comment-delimiter for formated non-docbook comments.
-NDB_BEG='^(.*)/\*(([^*=-_!]|$)([^*]|[*]+([^*/]|$))*)$'
-# Comment-delimiter for formated docbook comments.
-FDB_BEG='^(.*)/\*!(([^*]|[*]+([^*/]|$))*)$'
+# The sed commands to load the whole file into the pattern space.
+SED_LOAD='
+  1 {h; d;};
+  $! {H; d;};
+  $ {H; x;};'
 
 # Convert Doxygen comments to '/*!' or '/**' depending on FCD_OPT to
 # enable/disable formatting. We always format Doxygen '/**<' member
 # comments so they indent correctly.
 if [ $FCD_OPT == 1 ]; then
-  sed -r -i 's:/\*\*([ <]|$):/*!\1:' "$@"
+  SED_PRE1='s:/\*\*([ <]|$):/*!\1:;'
 else
-  sed -r -i 's:/\*!( |$):/**\1:; s:/\*\*<:/*!<:' "$@"
+  SED_PRE1='s:/\*!( |$):/**\1:; s:/\*\*<:/*!<:;'
 fi
 
 # Wrap Doxygen \code...\endcode blocks in immutable /*=...=*/ comments.
 if [ $FCD_OPT == 1 ]; then
-  sed -r -i "\\:${FDB_BEG}:,\\:${CMT_END}: {"'
+  SED_PRE1="${SED_PRE1}
+  \\:${FDB_BEG}:,\\:${CMT_END}: {"'
     s:\\code:\\code */\n/*=\\code:;
     s:^(((\s*) [ *] )?.*)\\endcode:\1\\endcode=*/\n\3/*! \\endcode:;
-  }
-  ' "$@"
+  };'
+fi
+
+# For -iec comment out extern "C" {...} wrappers.
+# Note this sucks the whole file into the pattern space.
+if [ $IEC_OPT == 1 ]; then
+  SED_PRE1="${SED_PRE1} ${SED_LOAD} "'
+  s:^(.*\n)(extern "C" \{)(.*\n)(\})([^}]*)$:\1/*=\2=*/\3/*=\4=*/\5:;'
 fi
 
 # Strip leading '*'s from comments and suck in comment delimiters on
 # blank lines. They will be re-added by indent if using -sc or -cdb.
-sed -r -i "
+# Note this sucks the whole comment into the pattern space.
+SED_PRE2="
 \\:${CMT_BEG}:,\\:${CMT_END}: {
-  \\:${CMT_BEG}: { h; d; };
-  s:${CMT_STR}:\\1 \\2:
-  \\:${CMT_END}:! { H; d; };
-  \\:${CMT_END}: {"'
-    H; x;
-    s:(/\*!?)\s+:\1 :;
-    s:\s+\*/: */:
-  };
-}' "$@"
+  s:${CMT_STR}:\\1 \\2:;
+  \\:${CMT_BEG}: {h; d;};
+  \\:${CMT_END}:! {H; d;};
+  \\:${CMT_END}: {H; x;};"'
+  s:(/\*!?)\s+:\1 :;
+  s:\s+\*/: */:;
+};'
 
-# Add/Remove Doxygen \brief tags depending on DAB_OPT and DQT_OPT.
-if [ $DAB_OPT == 1 ]; then
-  sed -r -i 's:/\*! [\\@]brief :/*! :' "$@"
-elif [ $DQT_OPT == 1 ]; then
-  sed -r -i 's:/\*! ([^\\@]):/*! @brief \1:' "$@"
-else
-  sed -r -i 's:/\*! ([^\\@]):/*! \\brief \1:' "$@"
+# Add/Remove Doxygen \brief tags depending on FCD_OPT, DAB_OPT and DQT_OPT.
+if [ $FCD_OPT == 1 ]; then
+  if [ $DAB_OPT == 1 ]; then
+    SED_PRE2="${SED_PRE2} "'s:/\*! [\\@]brief :/*! :;'
+  elif [ $DQT_OPT == 1 ]; then
+    SED_PRE2="${SED_PRE2} "'s:/\*! ([^\\@]):/*! @brief \1:;'
+  else
+    SED_PRE2="${SED_PRE2} "'s:/\*! ([^\\@]):/*! \\brief \1:;'
+  fi
 fi
 
-# For -iec comment out extern "C" {...} wrappers.
-if [ $IEC_OPT == 1 ]; then
-  sed -r -i '
-  1 {h; d;};
-  $! {H; d;};
-  $ {
-    H; x;
-    s:^(.*\n)(extern "C" \{)(.*\n)(\})([^}]*)$:\1/*=\2=*/\3/*=\4=*/\5:;
-  }' "$@"
-fi
-
-# Tidy code using indent.
-echo Running: indent ${INDENT_ARGS} "$@"
-indent ${INDENT_ARGS} "$@"
-
-# For -iec restore commented out extern "C" {...} wrappers.
-if [ $IEC_OPT == 1 ]; then
-  sed -r -i '
-  1 {h; d;};
-  $! {H; d;};
-  $ {
-    H; x;
-    s:^(.*\n)/\*=(extern "C" \{)=\*/(.*\n)/\*=(\})=\*/([^}]*)$:\1\2\3\4\5:;
-  }' "$@"
-fi
-
-# Remove struct prefix from userdefined types.
-# indent adds these when the struct and type has the same name.
-# Things like libev uses the same name for the type and struct.
-# sed -r -i "s:struct (${TYPE_RE} ):\\1:g" "$@"
+# Repair Doxygen '/*!' comments.
+SED_POST1="${SED_POST1}"'
+\:/\*$: {
+  N;
+  s:/\*(\n\s+[* ] )! :/*!\1:;
+};
+s:/\* !:/*!:;
+'
 
 # Remove space between * or & and identifier after userdefined types.
 # There is no indent argument for this, it always does it for known types.
 # int f(my_t * o); -> int f(my_t *o);
-sed -r -i "s:((${TYPE_RE}|${CAST_RE}) (&|\\*+)) :\\1:g" "$@"
+SED_POST2="s:((${TYPE_RE}|${CAST_RE}) (&|\\*+)) :\\1:g;"
 
 # Remove space after type cast using userdefined types.
 # This manually implements -ncs for userdefined types.
 # a = f((my_t) o); -> a = f((my_t)o);
 if [[ "${INDENT_ARGS}" =~ -linux|-ncs && "${INDENT_ARGS}" != *-cs* ]]; then
-  sed -r -i "s:(${CAST_RE}) :\\1:g" "$@"
+  SED_POST2="${SED_POST2} s:(${CAST_RE}) :\\1:g;"
 fi
-
-# Repair Doxygen '/*!' comments and trim trailing whitespace added by -sc.
-sed -r -i '
-\:/\*$: {
-  N;
-  s:/\*\s*\n(\s+(\* )?)! :/*!\n\1:;
-};
-s:/\* !:/*!:;
-s:\s+$::
-' "$@"
 
 # For -nsc, strip leading '*'s from formated non-docbook comments.
 if [[ $SC_OPT == 0 && $DSC_OPT == 1 ]]; then
-  sed -r -i "\\:${NDB_BEG}:,\\:${CMT_END}: {
+  SED_POST2="${SED_POST2} \\:${NDB_BEG}:,\\:${CMT_END}: {
     s:${CMT_STR}:\\1 \\2:;
-    s:\s+$::
-  }" "$@"
+  };"
 fi
 
 # For -ndsc, strip leading '*'s from formated docbook comments.
 if [[ $SC_OPT == 1 && $DSC_OPT == 0 ]]; then
-  sed -r -i "\\:${FDB_BEG}:,\\:${CMT_END}: {
+  SED_POST2="${SED_POST2} \\:${FDB_BEG}:,\\:${CMT_END}: {
     s:${CMT_STR}:\\1 \\2:;
-    s:\s+$::
-  }" "$@"
+  };"
 fi
+
+# Trim trailing whitespace added by -sc or left by stripping stars.
+SED_POST2="${SED_POST2}"'s:\s+$::;'
+
+# Suck the whole file into the pattern space.
+SED_POST2="${SED_POST2} ${SED_LOAD}"
 
 # Remove immutable /*=...=*/ comment wrappers around \code..\endcode blocks.
 if [ $FCD_OPT == 1 ]; then
-  sed -r -i '\:\\code: {
-    N; N; s:\\code\s*\*/\n/\*=\\code:\\code:;
-  };
-  \:\\endcode: {
-    N; N; s:\\endcode=\*/\n\s*/\*!(\s*[ *])? \\endcode:\\endcode:;
-  }' "$@"
+  SED_POST2="${SED_POST2}"'
+  s:\\code\s*\*/\n/\*=\\code:\\code:g;
+  s:\\endcode=\*/\n\s*/\*!(\s*[ *])? \\endcode:\\endcode:g;'
+fi
+
+# For -iec restore commented out extern "C" {...} wrappers.
+if [ $IEC_OPT == 1 ]; then
+  SED_POST2="${SED_POST2}"'
+  s:^(.*\n)/\*=(extern "C" \{)=\*/(.*\n)/\*=(\})=\*/([^}]*)$:\1\2\3\4\5:;'
 fi
 
 # Convert Doxygen comments to JavaDoc or Qt style depending on DJD_OPT.
 if [ $DQT_OPT == 1 ]; then
-  sed -r -i 's:/\*\*:/*!:' "$@"
+  SED_POST2="${SED_POST2}"'s:/\*\*:/*!:g'
 else
-  sed -r -i 's:/\*\!:/**:' "$@"
+  SED_POST2="${SED_POST2}"'s:/\*\!:/**:g;'
 fi
+
+# Preprocess code with sed.
+sed -r -i "${SED_PRE1}" "$@"
+sed -r -i "${SED_PRE2}" "$@"
+
+# Tidy code using indent.
+echo Running: indent ${INDENT_ARGS} "$@"
+indent ${INDENT_ARGS} "$@"
+
+# Postprocess code with sed.
+sed -r -i "${SED_POST1}" "$@"
+sed -r -i "${SED_POST2}" "$@"
