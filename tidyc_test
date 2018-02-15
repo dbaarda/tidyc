@@ -11,6 +11,9 @@
 # args: -arg1 -arg2 [...]
 #
 
+# Expected outputs of tests to run on cmdline (Default: tests/*.out).
+tests=${@:-tests/*.out}
+
 # Run a cmd and fail the test if cmd fails.
 run_test () {
   echo "Running: $@" >&2
@@ -30,12 +33,14 @@ do_test () {
   input=${name%%_*}.c
   output=tests/output.c
   args="${name//_/ -} "; args=${args#* }
+  echo
+  echo $expect
   cp $input $output
   run_test ./tidyc $args $output
   run_test diff -q $expect $output
   rm -f $output
 }
 
-for expect in tests/*.out; do
+for expect in $tests; do
   do_test $expect
 done
