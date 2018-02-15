@@ -67,13 +67,13 @@
                                              *
                                              * With another short paragraph. */
 
-                                            /* here is a wierdly indented quote 
+                                            /* here is a wierdly indented quote
                                              * that goes too far over two
                                              * lines.
                                              *
                                              * With another short paragraph. */
 
-                                            /* here is a wierdly indented quote 
+                                            /* here is a wierdly indented quote
                                              * that goes too far over two
                                              * lines.
                                              *
@@ -91,13 +91,13 @@
                                              *
                                              * With another short paragraph. */
 
-                                            /* here is a wierdly indented quote 
+                                            /* here is a wierdly indented quote
                                              * that goes too far over two
                                              * lines.
                                              *
                                              * With another short paragraph. */
 
-                                            /* here is a wierdly indented quote 
+                                            /* here is a wierdly indented quote
                                              * that goes too far over two
                                              * lines.
                                              *
@@ -184,9 +184,9 @@ typedef struct foo {
     /** a comment that's indented */
 
     int a;                      /** A short comment. */
-    int b;                      /** A very long comment that goes way past the 
+    int b;                      /** A very long comment that goes way past the
                                  * end of the max line length. */
-    int c;                      /** A very long comment that goes way past the 
+    int c;                      /** A very long comment that goes way past the
                                  * end of the max line length.
                                  *
                                  * With another paragraph that is too short. */
@@ -201,9 +201,9 @@ typedef struct foo {
     /** a comment that's indented */
 
     int a;                      /** A short comment. */
-    int b;                      /** A very long comment that goes way past the 
+    int b;                      /** A very long comment that goes way past the
                                  * end of the max line length. */
-    int c;                      /** A very long comment that goes way past the 
+    int c;                      /** A very long comment that goes way past the
                                  * end of the max line length.
                                  *
                                  * With another paragraph that is too short. */

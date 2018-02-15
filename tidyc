@@ -172,8 +172,8 @@ if [[ "${INDENT_ARGS}" =~ -linux|-ncs && "${INDENT_ARGS}" != *-cs* ]]; then
 fi
 
 # Repair Doxygen '/*!' comments and trim trailing whitespace added by -sc.
-sed -r -i "
-\\:${CMT_BEG}: {"'
+sed -r -i '
+\:/\*$: {
   N;
   s:/\*\s*\n(\s+(\* )?)! :/*!\n\1:;
 };

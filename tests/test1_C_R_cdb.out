@@ -246,9 +246,9 @@ typedef struct foo {
      */
 
     int a;                      /** A short comment. */
-    int b;                      /** A very long comment that goes way past the 
+    int b;                      /** A very long comment that goes way past the
                                  * end of the max line length. */
-    int c;                      /** A very long comment that goes way past the 
+    int c;                      /** A very long comment that goes way past the
                                  * end of the max line length.
                                  *
                                  * With another paragraph that is too short. */
@@ -269,9 +269,9 @@ typedef struct foo {
      */
 
     int a;                      /** A short comment. */
-    int b;                      /** A very long comment that goes way past the 
+    int b;                      /** A very long comment that goes way past the
                                  * end of the max line length. */
-    int c;                      /** A very long comment that goes way past the 
+    int c;                      /** A very long comment that goes way past the
                                  * end of the max line length.
                                  *
                                  * With another paragraph that is too short. */
