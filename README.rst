@@ -187,9 +187,6 @@ The following are the currently known issues;
    partially messed up file. Make sure you have checked code in so you
    can restore it before using this.
 
-6. It's not at all optimized, and runs multiple sed cmds for various
-   transformations that could possibly be done in single runs.
-
 Support
 =======
 
