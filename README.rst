@@ -182,11 +182,6 @@ The following are the currently known issues;
    paragraph reformatting, resulting in long lines that include the
    code block. Don't do that.
 
-5. Each sed or indent stage does in-place edits of the file, so errors
-   in any stage, including invalid arguments for indent, will result in a
-   partially messed up file. Make sure you have checked code in so you
-   can restore it before using this.
-
 Support
 =======
 
