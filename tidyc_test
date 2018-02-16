@@ -37,6 +37,9 @@ do_test () {
   echo $expect
   run_test ./tidyc $args <$input >$output
   run_test diff -q $expect $output
+  cp -f $input $output
+  run_test ./tidyc $args $output
+  run_test diff -q $expect $output
   echo "PASS" 
   rm -f $output
 }
