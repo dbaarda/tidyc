@@ -27,8 +27,10 @@ DSC_OPT=1
 DQT_OPT=0
 DAB_OPT=1
 IEC_OPT=1
-while [ -z "${1##-*}" ]; do
+while [ "${1:0:1}" == "-" ]; do
   case "$1" in
+    # Stop parsing cmdline args at --.
+    --) shift; break ;;
     # Force particular styles, dropping suggested defaults.
     -L|-linux) INDENT_ARGS="-linux" ;;
     -K|-kr) INDENT_ARGS="-kr" ;;
@@ -206,14 +208,32 @@ else
   SED_POST2="${SED_POST2}"'s:/\*\!:/**:g;'
 fi
 
-# Preprocess code with sed.
-sed -r -i "${SED_PRE1}" "$@"
-sed -r -i "${SED_PRE2}" "$@"
+# Turn on pipe failure support.
+set -o pipefail
 
-# Tidy code using indent.
-echo Running: indent ${INDENT_ARGS} "$@"
-indent ${INDENT_ARGS} "$@"
+# Tidy code from stdin to stdout.
+do_tidyc () {
+  # Preprocess code with sed.
+  sed -r "${SED_PRE1}" |
+  sed -r "${SED_PRE2}" |
+  # Tidy code using indent.
+  indent ${INDENT_ARGS} |
+  # Postprocess code with sed.
+  sed -r "${SED_POST1}" |
+  sed -r "${SED_POST2}"
+}
 
-# Postprocess code with sed.
-sed -r -i "${SED_POST1}" "$@"
-sed -r -i "${SED_POST2}" "$@"
+# Tidy stdin or cmdline files.
+if [ "$1" == "" ]; then
+  do_tidyc
+else
+  for f in "$@"; do
+    o=$(mktemp "$f".XXXX) && 
+    {
+      do_tidyc < "$f" > "$o" &&
+      mv -f "$f" "$f~" &&
+      mv -f "$o" "$f" ||
+      rm "$o"
+    }
+  done
+fi

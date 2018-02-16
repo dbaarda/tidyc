@@ -17,12 +17,12 @@ tests=${@:-tests/*.out}
 # Run a cmd and fail the test if cmd fails.
 run_test () {
   echo "Running: $@" >&2
-  "$@" || fail_test "returncode=$?"
+  "$@" || fail_test
 }
 
 # Fail the test and exit.
 fail_test () {
-    echo "Failed! $1" >&2
+    echo "FAIL" >&2
     exit 2
 }
 
@@ -35,9 +35,9 @@ do_test () {
   args="${name//_/ -} "; args=${args#* }
   echo
   echo $expect
-  cp $input $output
-  run_test ./tidyc $args $output
+  run_test ./tidyc $args <$input >$output
   run_test diff -q $expect $output
+  echo "PASS" 
   rm -f $output
 }
 
