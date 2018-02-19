@@ -60,8 +60,9 @@ addresses several issues indent has, including:
     AUTOBRIEF support, removing or adding ``\brief`` tags to the first
     line of Doxygen comments.
 
-13. Adds some convenient shortcuts like ``-C`` for ``-fc1 -fca -fcd`` and
-    ``-R`` for ``-sob --ignore-newlines``.
+13. Adds some convenient shortcuts like ``-C`` for ``-fc1 -fca -fcd``
+    to reformat all comments and ``-R`` for ``-sob -nhnl`` to reformat
+    all line breaks.
 
 14. Has my preferred defaults which is mostly linux without tabs and
     with starred autobrief JavaDoc Doxygen comments.
@@ -124,7 +125,7 @@ following additions;
    -G  Resets settings to ``-gnu``.
    -B  Resets settings to ``-orig``.
    -C  Reformat comments. Equivalent to ``-fc1 -fca -fcd``.
-   -R  Reformat lines breaks. Equivalent to ``-sob --ignore-newlines``.
+   -R  Reformat line breaks. Equivalent to ``-sob -nhnl``.
    -fcd, --format-doxygen-comments
        Enable Doxygen comment formatting. This will enable indenting,
        starring/unstaring based on ``-dsc|-ndsc``, rebracketing with/without

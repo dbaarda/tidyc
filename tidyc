@@ -2,7 +2,7 @@
 
 # Other interesting indent args;
 #   -sob - swallow extra blank lines.
-#   --ignore-newlines - reformat wrapped lines.
+#   -nhnl - reformat wrapped lines.
 #   -bfda - function definition args one per line.
 #   -ncs - no space after cast.
 #   -ppi2 - 2 space preprocessor indentation.
@@ -37,7 +37,7 @@ while [ "${1:0:1}" == "-" ]; do
     -G|-gnu) INDENT_ARGS="-gnu" ;;
     -B|-orig) INDENT_ARGS="-orig" SC_OPT=1 ;;
     # Reformat existing blank lines and linebreaks.
-    -R) INDENT_ARGS="${INDENT_ARGS} -sob --ignore-newlines" ;;
+    -R) INDENT_ARGS="${INDENT_ARGS} -sob -nhnl" ;;
     # Reformat all comments, including docbook comments.
     -C) INDENT_ARGS="${INDENT_ARGS} -fc1 -fca" FCD_OPT=1;;
     # Enable/disable star comments.
