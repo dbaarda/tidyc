@@ -67,6 +67,9 @@ addresses several issues indent has, including:
 14. Has my preferred defaults which is mostly linux without tabs and
     with starred autobrief JavaDoc Doxygen comments.
 
+15. Adds ``-iec`` and ``-niec`` options to enable/disable ignoring
+    ``extern "C" {...}`` enclosing blocks for indenting.
+
 Contents
 ========
 
@@ -156,6 +159,15 @@ following additions;
        Like indent's ``-T`` except adds support for using extended
        regexes like ``/ev_\w+/`` to match types like ``ev_event``. Note
        that ``/w+_t/`` is already included by default.
+   -iec, --ignore-extern-c
+       Enable ignoring enclosing ``extern "C" {...}`` blocks for
+       indenting.
+   -niec, --dont-ignore-extern-c
+       Disable ignoring enclosing ``extern "C" {...}`` blocks.
+
+The default arguments are equivalent to::
+
+    $ tidyc -linux -nut -i4 -ppi2 -l120 -lc80 -fc1 -nfcd -dsc -ndqt -dab -iec
 
 Issues
 ======
