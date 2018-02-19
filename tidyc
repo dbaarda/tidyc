@@ -20,7 +20,7 @@ INDENT_ARGS='-linux -nut -i4 -ppi2 -l120 -lc80 -fc1'
 # regex to make these minor adjustments after indent has run, using the
 # following regex to match user-defined types. This is the default, and
 # additional regexes can be added using "-T /regex/" arguments.
-TYPE_RE='(ev_\w+)|(\w+_[ft])'
+TYPE_RE='(\w+_t)'
 SC_OPT=0
 FCD_OPT=0
 DSC_OPT=1

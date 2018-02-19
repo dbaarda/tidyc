@@ -155,19 +155,19 @@ following additions;
        Disable Doxygen autobrief support. This will add ``\brief`` or
        ``@brief`` tags depending on ``-dqt`` to the first line of Doxygen
        comments.
-   -T <regex>
-       Like indent's ``-T`` except adds support for using extended
-       regexes like ``/ev_\w+/`` to match types like ``ev_event``. Note
-       that ``/w+_t/`` is already included by default.
    -iec, --ignore-extern-c
        Enable ignoring enclosing ``extern "C" {...}`` blocks for
        indenting.
    -niec, --dont-ignore-extern-c
        Disable ignoring enclosing ``extern "C" {...}`` blocks.
+   -T <regex>
+       Like indent's ``-T`` except adds support for using extended
+       regexes like ``/ev_\w+/`` to match types like ``ev_event``. Note
+       that ``/w+_t/`` is already included by default.
 
 The default arguments are equivalent to::
 
-    $ tidyc -linux -nut -i4 -ppi2 -l120 -lc80 -fc1 -nfcd -dsc -ndqt -dab -iec
+    $ tidyc -linux -nut -i4 -ppi2 -l120 -lc80 -fc1 -nfcd -dsc -ndqt -dab -iec -T /w+_t/
 
 Issues
 ======
