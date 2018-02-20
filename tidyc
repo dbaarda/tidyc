@@ -116,11 +116,11 @@ if [ $FCD_OPT == 1 ]; then
   };'
 fi
 
-# For -iec comment out extern "C" {...} wrappers.
+# For -iec remove brackets of extern "C" {...} wrappers.
 # Note this sucks the whole file into the pattern space.
 if [ $IEC_OPT == 1 ]; then
   SED_PRE1="${SED_PRE1} ${SED_LOAD} "'
-  s:^(.*\n)(extern "C" \{)(.*\n)(\})([^}]*)$:\1/*=\2=*/\3/*=\4=*/\5:;'
+  s:\n(extern "C") \{(.*\n)\}:\n\1;\2;:;'
 fi
 
 # Strip leading '*'s from comments and suck in comment delimiters on
@@ -195,10 +195,10 @@ if [ $FCD_OPT == 1 ]; then
   s:\\endcode=\*/\n\s*/\*!(\s*[ *])? \\endcode:\\endcode:g;'
 fi
 
-# For -iec restore commented out extern "C" {...} wrappers.
+# For -iec restore brackets of extern "C" {...} wrappers.
 if [ $IEC_OPT == 1 ]; then
   SED_POST2="${SED_POST2}"'
-  s:^(.*\n)/\*=(extern "C" \{)=\*/(.*\n)/\*=(\})=\*/([^}]*)$:\1\2\3\4\5:;'
+  s:\n(extern "C");(.*\n);:\n\1 {\2}:;'
 fi
 
 # Convert Doxygen comments to JavaDoc or Qt style depending on DJD_OPT.
@@ -228,7 +228,7 @@ if [ "$1" == "" ]; then
   do_tidyc
 else
   for f in "$@"; do
-    o=$(mktemp "$f".XXXX) && 
+    o=$(mktemp "$f".XXXX) &&
     {
       do_tidyc < "$f" > "$o" &&
       mv -f "$f" "$f~" &&
