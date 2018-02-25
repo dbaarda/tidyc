@@ -136,6 +136,18 @@ SED_PRE2="
   s:\s+\*/: */:;
 };'
 
+# If reformating comments, turn para's into single lines and suck in
+# multiple spaces to make indent repeatable. This relies on the whole
+# comment being in the pattern space.
+if [[ "${INDENT_ARGS}" =~ -fca && "${INDENT_ARGS}" =~ -fc1 ]]; then
+  SED_PRE2="${SED_PRE2}"'
+\:/\*[^*=-_].*\*/: {
+  s:\s*\n\s*\n\s*:*/*/*/:g;
+  s:(\S)\s\s+:\1 :g;
+  s:\*/\*/\*/:\n\n:g;
+};'
+fi
+
 # Add/Remove Doxygen \brief tags depending on FCD_OPT, DAB_OPT and DQT_OPT.
 if [ $FCD_OPT == 1 ]; then
   if [ $DAB_OPT == 1 ]; then

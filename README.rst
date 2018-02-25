@@ -70,6 +70,10 @@ addresses several issues indent has, including:
 15. Adds ``-iec`` and ``-niec`` options to enable/disable ignoring
     ``extern "C" {...}`` enclosing blocks for indenting.
 
+16. Is more repeatable than indent, with repeated runs over the same
+    input producing the same output (indent paragraph reformatting
+    with ``-fca`` can produce different results in repeated runs).
+
 Contents
 ========
 
