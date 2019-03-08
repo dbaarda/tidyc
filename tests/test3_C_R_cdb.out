@@ -1,8 +1,16 @@
+/**
+ * \file test3.c
+ * Source testing -iec and doxygen structural commands.
+ *
+ * Structural commands should work with adding/removing brief tags.
+ */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
+ * \struct foo
  * A struct.
  *
  * With struct details.

@@ -13,12 +13,11 @@ extern "C" {
  * With struct details. */
 typedef struct foo {
     int a;                      /**< a short comment. */
-    int b;                      /**< A very long comment that goes way past
-                                 * the end of the max line length. */
-    int c;                      /**< A very long comment that goes way past
-                                 * the end of the max line length.
+    int b;                      /**< A very long comment that goes way past the end of the max line length. */
+    int c;                      /**< A very long comment that goes way past the end of the max line length.
                                  *
-                                 * With another paragraph that is too short. */
+                                 * With another paragraph
+                                 * that is too short. */
 } foo_t;
 
 /** A func.
@@ -32,8 +31,7 @@ int bar(int a)
 {
     int b;                      /* not doxygen */
 
-    /* Also not doxygen, but rather long and should be a comment that wraps
-       because its so long.
+    /* Also not doxygen, but rather long and should be a comment that wraps because its so long.
 
        It also has another paragraph. */
     return b;

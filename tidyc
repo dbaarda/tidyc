@@ -97,6 +97,8 @@ SED_LOAD='
   1 {h; d;};
   $! {H; d;};
   $ {H; x;};'
+# Doxygen C structure commands.
+DOX_STR='[\\@](struct|union|enum|fn|var|def|typedef|file) [^\n]*\n'
 
 # Convert Doxygen comments to '/*!' or '/**' depending on FCD_OPT to
 # enable/disable formatting. We always format Doxygen '/**<' member
@@ -136,27 +138,33 @@ SED_PRE2="
   s:\s+\*/: */:;
 };'
 
+# If formatting doxygen comments, tidy commands.
+if [ $FCD_OPT == 1 ]; then
+  # Put structural commands in their own paragraph.
+  SED_PRE2="${SED_PRE2} "'s:(/\*! '"${DOX_STR}"'):\1\n:;'
+  # Add/Remove Doxygen \brief tags depending on FCD_OPT, DAB_OPT and DQT_OPT.
+  if [ $DAB_OPT == 1 ]; then
+    SED_PRE2="${SED_PRE2}"'
+    s:/\*! ('"${DOX_STR}"'\s*)?[\\@]brief :/*! \1:;'
+  elif [ $DQT_OPT == 1 ]; then
+    SED_PRE2="${SED_PRE2}"'
+    s:/\*! ('"${DOX_STR}"'\s*)?([^\\@ \t\n]):/*! \1\\brief \3:;'
+  else
+    SED_PRE2="${SED_PRE2}"'
+    s:/\*! ('"${DOX_STR}"'\s*)?([^\\@ \t\n]):/*! \1@brief \3:;'
+  fi
+fi
+
 # If reformating comments, turn para's into single lines and suck in
 # multiple spaces to make indent repeatable. This relies on the whole
 # comment being in the pattern space.
 if [[ "${INDENT_ARGS}" =~ -fca && "${INDENT_ARGS}" =~ -fc1 ]]; then
   SED_PRE2="${SED_PRE2}"'
-\:/\*[^*=-_].*\*/: {
-  s:\s*\n\s*\n\s*:*/*/*/:g;
-  s:(\S)\s\s+:\1 :g;
-  s:\*/\*/\*/:\n\n:g;
-};'
-fi
-
-# Add/Remove Doxygen \brief tags depending on FCD_OPT, DAB_OPT and DQT_OPT.
-if [ $FCD_OPT == 1 ]; then
-  if [ $DAB_OPT == 1 ]; then
-    SED_PRE2="${SED_PRE2} "'s:/\*! [\\@]brief :/*! :;'
-  elif [ $DQT_OPT == 1 ]; then
-    SED_PRE2="${SED_PRE2} "'s:/\*! ([^\\@]):/*! @brief \1:;'
-  else
-    SED_PRE2="${SED_PRE2} "'s:/\*! ([^\\@]):/*! \\brief \1:;'
-  fi
+  \:/\*[^*=-_].*\*/: {
+    s:\s*\n\s*\n\s*:*/*/*/:g;
+    s:(\S)\s\s+:\1 :g;
+    s:\*/\*/\*/:\n\n:g;
+  };'
 fi
 
 # Repair Doxygen '/*!' comments.
@@ -200,8 +208,12 @@ SED_POST2="${SED_POST2}"'s:\s+$::;'
 # Suck the whole file into the pattern space.
 SED_POST2="${SED_POST2} ${SED_LOAD}"
 
-# Remove immutable /*=...=*/ comment wrappers around \code..\endcode blocks.
+# If formatting doxygen comments, tidy commands.
 if [ $FCD_OPT == 1 ]; then
+  # Suck in blank line after doxygen structural commands.
+  SED_POST2="${SED_POST2}"'
+  s:(/\*!\s*\*?\s*'"${DOX_STR}"')\s*\*?\n:\1:g;'
+  # Remove immutable /*=...=*/ comment wrappers around \code..\endcode blocks.
   SED_POST2="${SED_POST2}"'
   s:\\code\s*\*/\n/\*=\\code:\\code:g;
   s:\\endcode=\*/\n\s*/\*!(\s*[ *])? \\endcode:\\endcode:g;'
